@@ -1,0 +1,20 @@
+.main-menu-buttons {
+    margin: 15px 0;
+}
+.main-menu-buttons input{
+    color: black;
+    background-color: transparent;
+}
+
+.main-menu-buttons input.active{
+    color: white;
+    background-color: #286090;
+}
+
+/* Sortable tables */
+table.sortable thead {
+    background-color:#eee;
+    color:#666666;
+    font-weight: bold;
+    cursor: default;
+}

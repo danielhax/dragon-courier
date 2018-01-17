@@ -1,0 +1,14 @@
+{
+    "name": "danielviernes/bde-shipping",
+    "description": "A custom courier business plugin",
+    "type": "project",
+    "license": "GPL",
+    "authors": [
+        {
+            "name": "Daniel Viernes",
+            "email": "ddvrns@gmail.com"
+        }
+    ],
+    "minimum-stability": "dev",
+    "require": {}
+}
