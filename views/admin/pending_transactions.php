@@ -1,4 +1,56 @@
-<form class="log-transaction-form admin-form">
+<div class="pending-transactions-table admin-form">
+    <div class="no-pending">
+        <h2>No pending shipments at this time.</h2>
+    </div>
+
+    <div class="container" style="display: none;">
+    <h2>Delivery History</h2>
+    <p>Sample Table</p>
+    <table class="table sortable">
+        <thead>
+        <tr>
+            <th>Firstname</th>
+            <th>Lastname</th>
+            <th>Email</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td>Default</td>
+            <td>Defaultson</td>
+            <td>def@somemail.com</td>
+        </tr>      
+        <tr class="success">
+            <td>Success</td>
+            <td>Doe</td>
+            <td>john@example.com</td>
+        </tr>
+        <tr class="danger">
+            <td>Danger</td>
+            <td>Moe</td>
+            <td>mary@example.com</td>
+        </tr>
+        <tr class="info">
+            <td>Info</td>
+            <td>Dooley</td>
+            <td>july@example.com</td>
+        </tr>
+        <tr class="warning">
+            <td>Warning</td>
+            <td>Refs</td>
+            <td>bo@example.com</td>
+        </tr>
+        <tr class="active">
+            <td>Active</td>
+            <td>Activeson</td>
+            <td>act@example.com</td>
+        </tr>
+        </tbody>
+    </table>
+    </div>
+</div>
+
+<!-- <form class="log-transaction-form admin-form">
     <div class="form-group">
         <label for="transaction-no">Transaction no.:</label>
         <input type="text" class="form-control" name="transaction-no" id="transaction-no" placeholder="Transaction #">
@@ -59,4 +111,4 @@
         <input type="text" value="0" name="cost" id="cost" disabled>
     </div>
     <button type="submit" class="btn btn-default">Submit</button>
-</form> 
+</form>  -->

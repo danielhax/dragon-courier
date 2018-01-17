@@ -1,0 +1,12 @@
+span.required {
+    color: red;
+}
+.delivery-form {
+    display: block;
+    margin: 0 auto;
+    max-width: 40%;
+}
+
+#dimensions input {
+    width: 120px;
+}

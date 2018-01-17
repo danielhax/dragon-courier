@@ -39,22 +39,29 @@ class DragonCourier {
         $this->register_admin_pages();
 
         $this->register_scripts();
+
+        $this->register_short_codes();
     }
 
     private function register_scripts() {
-        add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_scripts' ) );
+        add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_admin_scripts' ) );
+        add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_user_scripts' ) );
     }
 
-    function enqueue_scripts() {
+    function enqueue_admin_scripts() {
         //priority
         wp_enqueue_script( 'jquery', 'https://code.jquery.com/jquery-3.2.1.min.js');
         //styles
         wp_enqueue_style( 'bootstrap', 'https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css');
-        wp_enqueue_style( 'style', plugins_url( '/css/admin-style.css', __FILE__ ) );
+        wp_enqueue_style( 'admin_style', plugins_url( '/css/admin-style.css', __FILE__ ) );
         //scripts
         wp_enqueue_script( 'bootstrap', 'https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js');
         wp_enqueue_script( 'sorttable', plugins_url( '/js/sorttable.js', __FILE__ ) );
         wp_enqueue_script( 'admin_custom_script', plugins_url( '/js/admin.js', __FILE__) );
+    }
+
+    function enqueue_user_scripts() {
+        wp_enqueue_style( 'user_style', plugins_url( '/css/user-style.css', __FILE__ ) );
     }
 
     function activate() {
@@ -73,8 +80,16 @@ class DragonCourier {
         add_action( 'admin_menu', array( $this, 'add_admin_pages' ) );
     }
 
+    private function register_short_codes(){
+        add_shortcode( 'dragon-delivery-form', array( $this, 'delivery_form_sc' ) );
+    }
+
+    function delivery_form_sc(){
+        include(plugin_dir_path( __FILE__ ) . "/views/user/delivery_form.php");
+    }
+
     function add_admin_pages() {
-        add_menu_page( 'Dragon Courier Panel', 'BDE', 'manage_options', 'bde_shipping', array( $this, 'admin_index' ), '
+        add_menu_page( 'Dragon Courier Panel', 'Shipments', 'manage_options', 'bde_shipping', array( $this, 'admin_index' ), '
         dashicons-book-alt', 110 );
     }
 
@@ -84,12 +99,12 @@ class DragonCourier {
 
 }
 
-if( class_exists( 'BDEShipping' ) ) {
-    $dc_plugin = new DragonCourier();
+if( class_exists( 'DragonCourier' ) ) {
+    $dc = new DragonCourier();
 }
 
 // activation
-register_activation_hook( __FILE__, array( $bde_plugin, 'activate' ) );
+register_activation_hook( __FILE__, array( $dc, 'activate' ) );
 
 //deactivate
-register_deactivation_hook( __FILE__ , array( $bde_plugin, 'deactivate') );
+register_deactivation_hook( __FILE__ , array( $dc, 'deactivate') );

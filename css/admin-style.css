@@ -1,12 +1,12 @@
 .main-menu-buttons {
     margin: 15px 0;
 }
-.main-menu-buttons input{
+.main-menu-buttons input {
     color: black;
     background-color: transparent;
 }
 
-.main-menu-buttons input.active{
+.main-menu-buttons input.active {
     color: white;
     background-color: #286090;
 }
