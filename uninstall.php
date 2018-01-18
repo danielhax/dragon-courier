@@ -1,9 +1,9 @@
 <?php
 
 /*
-* Uninstall BDE Shipping
+* Uninstall Dragon Courier
 *
-* @package BDEShipping
+* @package DragonCourier
 */
 
 defined( 'WP_UNINSTALL_PLUGIN' ) or die( 'You don\t ave permission to access this file!' );

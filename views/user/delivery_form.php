@@ -2,30 +2,30 @@
     <h3>Recipient's Information</h3>
     <div class="form-group">
         <label for="first-name">First Name<span class="required">*</span></label>
-        <input type="text" class="form-control" name="first-name" id="first-name" placeholder="First Name" required>
+        <input type="text" class="form-control" name="first_name" id="first-name" placeholder="First Name" required>
     </div>
     <div class="form-group">
         <label for="last-name">Last Name<span class="required">*</span></label>
-        <input type="text" class="form-control" name="last-name" id="last-name" placeholder="Last Name" required>
+        <input type="text" class="form-control" name="last_name" id="last-name" placeholder="Last Name" required>
     </div>
     <div class="form-group">
         <label for="delivery-address">Street Address<span class="required">*</span></label>
-        <input type="text" class="form-control" name="delivery-address" id="delivery-address" placeholder="Street Address" required>
+        <input type="text" class="form-control" name="delivery_address" id="delivery-address" placeholder="Street Address" required>
     </div>
     <div class="row form-group">
         <div class="col-md-6">
             <label for="delivery-city">City<span class="required">*</span></label>
-            <input type="text" class="form-control" name="delivery-city" id="delivery-city" placeholder="City" required>
+            <input type="text" class="form-control" name="delivery_city" id="delivery-city" placeholder="City" required>
         </div>
         <div class="col-md-6">
             <label for="delivery-postal">Postal Code<span class="required">*</span></label>
-            <input type="text" class="form-control" name="delivery-postal" id="delivery-postal" placeholder="Postal Code" required>
+            <input type="text" class="form-control" name="delivery_postal" id="delivery-postal" placeholder="Postal Code" required>
         </div>
     </div>
     <div class="row form-group">
         <div class="col-md-6">
             <label for="mobile-no">Mobile Number<span class="required">*</span></label>
-            <input type="text" class="form-control" name="mobile-no" id="mobile-no" placeholder="Mobile No." required>
+            <input type="text" class="form-control" name="mobile_no" id="mobile-no" placeholder="Mobile No." required>
         </div>
         <div class="col-md-6">
             <label for="email">Email Address: </label>
@@ -35,7 +35,7 @@
     <h3>Package Information</h3>
     <div class="form-group">
         <label for="weight">Weight (kg)<span class="required">*</span></label>
-        <input type="number" class="form-control" value="0" name="weight" id="weight" required>
+        <input type="number" class="form-control" value="0" name="pkg_weight" id="weight" required>
     </div>
     <div class="form-group">
 
@@ -44,24 +44,24 @@
 
             <div class="form-group col-md-4">
                 <label for="length">Length</label>
-                <input type="number" class="form-control" value="0" name="length" id="length" required>
+                <input type="number" class="form-control" value="0" name="pkg_length" id="length" required>
             </div>
 
             <div class="form-group col-md-4">
                 <label for="width">Width</label>
-                <input type="number" class="form-control" value="0" name="width" id="width" required>
+                <input type="number" class="form-control" value="0" name="pkg_width" id="width" required>
             </div>
 
             <div class="form-group col-md-4">
                 <label for="height">Height</label>
-                <input type="number" class="form-control" value="0" name="height" id="height" required>
+                <input type="number" class="form-control" value="0" name="pkg_height" id="height" required>
             </div>
 
         </div>
     </div>
     <div class="form-group">
         <label for="Cost">Cost</label>
-        <input type="text" class="form-control" value="0" name="cost" id="cost" disabled>
+        <input type="text" class="form-control" value="0" name="delivery_cost" id="cost" disabled>
     </div>
     <button type="submit" class="btn btn-default">Submit</button>
 </form>

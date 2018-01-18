@@ -1,11 +1,11 @@
 <?php 
 /*
-* @package BDEShipping
+* @package DragonCourier
 */
 
 /*
 Plugin Name: Dragon Courier Plugin
-Plugin URI: 
+Plugin URI: http://github.com/danielhax/dragon-courier
 Description: Custom plugin for shipping company needs
 Version: 0.1
 Author: Daniel Viernes
@@ -30,6 +30,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 defined('ABSPATH') or die('You don\t have permission to access this file!');
+
+include plugin_dir_path( __FILE__ ) . '/database.php';
 
 class DragonCourier {
 
@@ -101,6 +103,10 @@ class DragonCourier {
 
 if( class_exists( 'DragonCourier' ) ) {
     $dc = new DragonCourier();
+}
+
+if( class_exists( 'DragonDB' ) ) {
+    $db = new DragonDB();
 }
 
 // activation
