@@ -1,35 +1,42 @@
-<form class="delivery-form">
+<form action="" method="post" class="delivery-form">
+    <!-- <input type="hidden" name="action" value="schedule_delivery"> -->
+    <?php wp_nonce_field( 'pickup_schedule' ); ?>
+
     <h3>Recipient's Information</h3>
     <div class="form-group">
-        <label for="first-name">First Name<span class="required">*</span></label>
-        <input type="text" class="form-control" name="first_name" id="first-name" placeholder="First Name" required>
+        <label for="r_first_name">First Name<span class="required">*</span></label>
+        <input type="text" class="form-control" name="r_first_name" id="r_first_name" placeholder="First Name" required value="Example">
     </div>
     <div class="form-group">
-        <label for="last-name">Last Name<span class="required">*</span></label>
-        <input type="text" class="form-control" name="last_name" id="last-name" placeholder="Last Name" required>
+        <label for="r_last_name">Last Name<span class="required">*</span></label>
+        <input type="text" class="form-control" name="r_last_name" id="r_last_name" placeholder="Last Name" required value="Example">
     </div>
     <div class="form-group">
-        <label for="delivery-address">Street Address<span class="required">*</span></label>
-        <input type="text" class="form-control" name="delivery_address" id="delivery-address" placeholder="Street Address" required>
+        <label for="r_address">Street Address<span class="required">*</span></label>
+        <input type="text" class="form-control" name="r_address" id="r_address" placeholder="Street Address" required value="Example">
+    </div>
+    <div class="row form-group">
+        <div class="col-md-4">
+            <label for="r_city">City<span class="required">*</span></label>
+            <input type="text" class="form-control" name="r_city" id="r_city" placeholder="City" required value="Example">
+        </div>
+        <div class="col-md-4">
+            <label for="r_brgy">Barangay<span class="required">*</span></label>
+            <input type="text" class="form-control" name="r_brgy" id="r_brgy" placeholder="Barangay" required value="Example">
+        </div>
+        <div class="col-md-4">
+            <label for="r_postal">Postal Code<span class="required">*</span></label>
+            <input type="text" class="form-control" name="r_postal" id="r_postal" placeholder="Postal Code" required value="12345">
+        </div>
     </div>
     <div class="row form-group">
         <div class="col-md-6">
-            <label for="delivery-city">City<span class="required">*</span></label>
-            <input type="text" class="form-control" name="delivery_city" id="delivery-city" placeholder="City" required>
+            <label for="r_mobile_no">Mobile Number<span class="required">*</span></label>
+            <input type="text" class="form-control" name="r_mobile_no" id="r_mobile_no" placeholder="Mobile No." required value="+639274817290">
         </div>
         <div class="col-md-6">
-            <label for="delivery-postal">Postal Code<span class="required">*</span></label>
-            <input type="text" class="form-control" name="delivery_postal" id="delivery-postal" placeholder="Postal Code" required>
-        </div>
-    </div>
-    <div class="row form-group">
-        <div class="col-md-6">
-            <label for="mobile-no">Mobile Number<span class="required">*</span></label>
-            <input type="text" class="form-control" name="mobile_no" id="mobile-no" placeholder="Mobile No." required>
-        </div>
-        <div class="col-md-6">
-            <label for="email">Email Address: </label>
-            <input type="email" class="form-control" name="email" id="email" placeholder="Email Address">
+            <label for="r_email">Email Address: </label>
+            <input type="email" class="form-control" name="r_email" id="r_email" placeholder="Email Address">
         </div>
     </div>
     <h3>Package Information</h3>
@@ -60,8 +67,28 @@
         </div>
     </div>
     <div class="form-group">
-        <label for="Cost">Cost</label>
-        <input type="text" class="form-control" value="0" name="delivery_cost" id="cost" disabled>
+        <label for="cost">Cost</label>
+        <input type="text" class="form-control" value="0" name="pkg_cost" id="cost" readonly>
     </div>
-    <button type="submit" class="btn btn-default">Submit</button>
+    <button type="submit" name="pickup_schedule_submit" class="btn btn-default">Submit</button>
 </form>
+
+<?php 
+
+if( isset ( $_POST['pickup_schedule_submit'] ) ) {
+
+    if( wp_verify_nonce( $_POST['_wpnonce'], 'pickup_schedule' ) ) {
+
+        $db = DragonDB::getInstance() or die( "ERROR ACCESSING DATABASE!" );;
+
+        $db->insert_schedule_request();
+
+    } else {
+
+        echo "Nonce could not be verified";
+
+    }
+
+}
+
+?>

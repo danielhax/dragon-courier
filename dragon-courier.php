@@ -36,21 +36,38 @@ include plugin_dir_path( __FILE__ ) . '/database.php';
 class DragonCourier {
 
     function __construct() {
-        //add_action( 'init', array( $this, 'custom_post_type' ) );
 
         $this->register_admin_pages();
 
         $this->register_scripts();
 
         $this->register_short_codes();
+
+        if( class_exists( 'DragonDB' ) ) {
+
+            $db = DragonDB::getInstance();
+            
+        } else {
+            echo "There was an error with Dragon Courier plugin. Please try reinstalling or contact the author.";
+        }
+
+        add_action( 'admin_post_schedule_delivery', array( $db , 'insert_schedule_request' ) );
+
+        //add_action( 'admin_post_nopriv_schedule_delivery', array( $db , 'insert_schedule_request' ) );
+
+        //add_action( 'init', array( $this, 'register_session') );
+
     }
 
     private function register_scripts() {
+
         add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_admin_scripts' ) );
         add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_user_scripts' ) );
+
     }
 
     function enqueue_admin_scripts() {
+
         //priority
         wp_enqueue_script( 'jquery', 'https://code.jquery.com/jquery-3.2.1.min.js');
         //styles
@@ -60,18 +77,25 @@ class DragonCourier {
         wp_enqueue_script( 'bootstrap', 'https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js');
         wp_enqueue_script( 'sorttable', plugins_url( '/js/sorttable.js', __FILE__ ) );
         wp_enqueue_script( 'admin_custom_script', plugins_url( '/js/admin.js', __FILE__) );
+
     }
 
     function enqueue_user_scripts() {
+
         wp_enqueue_style( 'user_style', plugins_url( '/css/user-style.css', __FILE__ ) );
+
     }
 
     function activate() {
+
         flush_rewrite_rules( );
+
     }
 
     function deactivate() {
+
         flush_rewrite_rules( );
+
     }
 
     // function custom_post_type() {
@@ -79,34 +103,52 @@ class DragonCourier {
     // }
 
     private function register_admin_pages(){
+
         add_action( 'admin_menu', array( $this, 'add_admin_pages' ) );
+
     }
 
     private function register_short_codes(){
+
         add_shortcode( 'dragon-delivery-form', array( $this, 'delivery_form_sc' ) );
+
     }
 
     function delivery_form_sc(){
+
         include(plugin_dir_path( __FILE__ ) . "/views/user/delivery_form.php");
+
     }
 
     function add_admin_pages() {
+
         add_menu_page( 'Dragon Courier Panel', 'Shipments', 'manage_options', 'bde_shipping', array( $this, 'admin_index' ), '
         dashicons-book-alt', 110 );
+
     }
 
     function admin_index() {
+
         require_once plugin_dir_path( __FILE__ ) . 'views/admin/index.php';
+
+    }
+
+    function register_session() {
+
+        if( !session_id() ) {
+            session_start();
+        }
+
     }
 
 }
 
 if( class_exists( 'DragonCourier' ) ) {
-    $dc = new DragonCourier();
-}
 
-if( class_exists( 'DragonDB' ) ) {
-    $db = new DragonDB();
+    $dc = new DragonCourier();
+
+} else {
+    echo "There was an error with Dragon Courier plugin. Please try reinstalling or contact the author.";
 }
 
 // activation

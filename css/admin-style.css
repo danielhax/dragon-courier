@@ -11,6 +11,10 @@
     background-color: #286090;
 }
 
+.ongoing-list {
+    width: 95%;
+}
+
 /* Sortable tables */
 table.sortable thead {
     background-color:#eee;
