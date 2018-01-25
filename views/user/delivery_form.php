@@ -75,20 +75,12 @@
 
 <?php 
 
-if( isset ( $_POST['pickup_schedule_submit'] ) ) {
-
-    if( wp_verify_nonce( $_POST['_wpnonce'], 'pickup_schedule' ) ) {
+    if( isset ( $_POST['pickup_schedule_submit'] ) ) {
 
         $db = DragonDB::getInstance() or die( "ERROR ACCESSING DATABASE!" );;
 
         $db->insert_schedule_request();
 
-    } else {
-
-        echo "Nonce could not be verified";
-
     }
-
-}
 
 ?>

@@ -51,12 +51,6 @@ class DragonCourier {
             echo "There was an error with Dragon Courier plugin. Please try reinstalling or contact the author.";
         }
 
-        add_action( 'admin_post_schedule_delivery', array( $db , 'insert_schedule_request' ) );
-
-        //add_action( 'admin_post_nopriv_schedule_delivery', array( $db , 'insert_schedule_request' ) );
-
-        //add_action( 'init', array( $this, 'register_session') );
-
     }
 
     private function register_scripts() {
@@ -74,9 +68,12 @@ class DragonCourier {
         wp_enqueue_style( 'bootstrap', 'https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css');
         wp_enqueue_style( 'admin_style', plugins_url( '/css/admin-style.css', __FILE__ ) );
         //scripts
-        wp_enqueue_script( 'bootstrap', 'https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js');
-        wp_enqueue_script( 'sorttable', plugins_url( '/js/sorttable.js', __FILE__ ) );
-        wp_enqueue_script( 'admin_custom_script', plugins_url( '/js/admin.js', __FILE__) );
+        wp_enqueue_script( 'bootstrap', 'https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js', array(), null, false);
+        wp_enqueue_script( 'sorttable', plugins_url( '/js/sorttable.js', __FILE__ ), array(), null, true );
+        wp_enqueue_script( 'admin_custom_script', plugins_url( '/js/admin.js', __FILE__), array('jquery'), null );
+        //localize
+        wp_localize_script( 'admin_custom_script', 'ajax_object',
+            array( 'ajax_url' => admin_url( 'admin-ajax.php' ) ) );
 
     }
 
@@ -116,7 +113,7 @@ class DragonCourier {
 
     function delivery_form_sc(){
 
-        include(plugin_dir_path( __FILE__ ) . "/views/user/delivery_form.php");
+        include( plugin_dir_path( __FILE__ ) . "/views/user/delivery_form.php" );
 
     }
 
@@ -133,13 +130,15 @@ class DragonCourier {
 
     }
 
-    function register_session() {
+    // function register_session() {
 
-        if( !session_id() ) {
-            session_start();
-        }
+    //     if( !session_id() ) {
 
-    }
+    //         session_start();
+
+    //     }
+
+    // }
 
 }
 
@@ -148,7 +147,9 @@ if( class_exists( 'DragonCourier' ) ) {
     $dc = new DragonCourier();
 
 } else {
+
     echo "There was an error with Dragon Courier plugin. Please try reinstalling or contact the author.";
+
 }
 
 // activation

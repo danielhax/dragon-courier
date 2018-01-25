@@ -9,6 +9,11 @@ class DragonDB {
 
         $this->create_db();
 
+        add_action( 'wp_ajax_update_tracking_no', array( $this, 'update_tracking_no' ) );
+        add_action( 'wp_ajax_tracking_no_assigned', array( $this, 'tracking_no_assigned' ) );
+        add_action( 'wp_ajax_complete_transaction', array( $this, 'complete_transaction' ) );
+        add_action( 'wp_ajax_cancel_transaction', array( $this, 'tracking_cancel_transaction' ) );
+
     }
 
     static function getInstance() {
@@ -22,6 +27,7 @@ class DragonDB {
         }
 
         return $db;
+
     }
 
     private function get_table_name(){
@@ -84,6 +90,12 @@ class DragonDB {
 
     function insert_schedule_request() {
 
+        if ( !wp_verify_nonce( $_POST['_wpnonce'], 'pickup_schedule' ) ) {
+
+            wp_die( 'Nonce could not be verified!' );
+
+        }
+
         global $wpdb;
 
         $wpdb->insert( $this->get_table_name(), array(
@@ -123,9 +135,125 @@ class DragonDB {
         //echo $wpdb->show_errors();
 
         $url = wp_nonce_url( home_url( 'success-page' ), 'post_sched' );
-
         wp_redirect( $url );
 
+    }
+
+    function update_tracking_no() {
+        /*
+         *   This function both adds a tracking no. (after checking it's unique)
+         *   AND changes the transaction's status from "Pending" to "Dispatched"
+         * 
+        */
+
+        if( !isset( $_POST['transaction_id'] ) ) {
+
+            echo json_encode(array( 'status' => 'error', 'msg' => 'Illegal action call' ));
+            wp_die();
+
+        }
+
+        global $wpdb;
+
+        $id = $_POST['transaction_id'];
+        $tracking_no = $this->get_tracking_no( $id );
+
+        if( $this->tracking_no_used( $tracking_no ) ) {
+
+            echo json_encode(array( 'status' => 'fail', 'msg' => 'The tracking number you entered has already been assigned to a different transaction' ));
+            wp_die();
+            
+        }
+
+        if( $tracking_no == null || $tracking_no == '') {
+
+            $result = $wpdb->update( $this->get_table_name(),                             //table
+                                    array(                                                //column=>value
+                                        'tracking_no' => $_POST['tracking-no'],
+                                        'status' => 'Dispatched'),     
+                                    array('id' => $id),                                 //where
+                                    array(
+                                        '%s', 
+                                        '%s'),                                               //value format
+                                    '%d');                                              //where format
+
+            if( $result === false ) {
+
+                echo json_encode(array( 'status' => 'error', 'msg' => 'There was an error while updating the transaction information' ));
+                wp_die();
+
+            }
+
+        } else {
+
+            echo json_encode(array( 'status' => 'error', 'msg' => 'A tracking number is already set. Please contact the author about this error' ));
+            wp_die();
+
+        }
+
+        echo json_encode( array( 'status' => 'success', 'msg' => 'Successfully assigned a tracking number' ) );
+        wp_die();        
+
+    }
+
+    function complete_transaction() {
+
+        global $wpdb;
+
+        
+
+    }
+
+    function get_transaction_archive() {
+
+        /*
+         *
+         * Returns transactions with a status of "Completed" or "Cancelled"
+         * 
+         */
+
+        global $wpdb;
+
+        $result = $wpdb->get_results( "SELECT * FROM {$this->get_table_name()} WHERE status='Completed' OR status='Cancelled'", ARRAY_A );
+
+        return $result;
+
+    }
+
+    function get_tracking_no( $id ) {
+
+        global $wpdb;
+        $tracking_no = $wpdb->get_var( "SELECT tracking_no FROM {$this->get_table_name()} WHERE id='{$id}'");
+
+        return $tracking_no;
+
+    }
+
+    function tracking_no_used( $tracking_no ) {
+
+        global $wpdb;
+        $count = $wpdb->get_var( "SELECT COUNT(*) FROM {$this->get_table_name()} WHERE tracking_no='{$tracking_no}'" );
+
+        if( $count == null || $count == 0 ) return false;
+
+        return true;
+
+    }
+
+    function tracking_no_assigned() {
+
+        global $wpdb;
+        $tracking_no = $this->get_tracking_no( intval( $_POST['transaction_id'] ) );
+
+        if( $tracking_no == null || $tracking_no == "" ) {
+
+            echo 'false';
+            wp_die();
+
+        }
+
+        echo 'true';
+        wp_die();
     }
 
     function get_incomplete_transactions() {
@@ -136,24 +264,6 @@ class DragonDB {
 
         $result = $wpdb->get_results( "SELECT * FROM {$tname} WHERE status != 'Completed'",
                     ARRAY_A);
-
-        // $result = $wpdb->get_results( "SELECT x.*, 
-        //                             CONCAT((SELECT y.meta_value 
-        //                                 FROM {$tmeta} as y 
-        //                                 WHERE y.user_id = x.user_id AND y.meta_key='last_name'), 
-        //                                 ', ', 
-        //                                 (SELECT y.meta_value 
-        //                                 FROM {$tmeta} as y 
-        //                                 WHERE y.user_id = x.user_id AND y.meta_key='first_name')) as customer 
-        //                             FROM {$tname} as x
-        //                             WHERE x.status = 'Pending';",
-        //             ARRAY_A);
-
-        // if( $result == null ) {
-
-        //     echo "There was an error with Dragon Courier plugin. Please contact the author.";
-
-        // }
 
         if( count( $result ) > 0) {
 
@@ -191,7 +301,6 @@ class DragonDB {
 
             $temp = array();
             $meta = $this->get_usermeta($row['user_id']);
-            //var_dump($meta);
 
             foreach ( $meta as $item ) {
 

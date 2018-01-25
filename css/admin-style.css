@@ -1,6 +1,11 @@
 .main-menu-buttons {
     margin: 15px 0;
 }
+
+.alert {
+    margin-bottom: 10px;
+}
+
 .main-menu-buttons input {
     color: black;
     background-color: transparent;
@@ -11,7 +16,7 @@
     background-color: #286090;
 }
 
-.ongoing-list {
+.transactions-table {
     width: 95%;
 }
 
