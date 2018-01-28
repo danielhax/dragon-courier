@@ -40,25 +40,10 @@ jQuery(function(){
         }
 
         jQuery.post( ajax_object.ajax_url, data, function( response ) {
-
-            console.log(response);
+            
             response = JSON.parse( response );
-            var alert = jQuery('.assign-tracking-no .alert');
-
-            switch( response.status ) {
-                case 'error': 
-                    alert.addClass( 'alert-danger' );
-                    break;
-                case 'fail': 
-                    alert.addClass( 'alert-warning' );
-                    break;
-                case 'success': 
-                    alert.addClass( 'alert-success' );
-                    break;
-            }
-
-            alert.text( response.msg );
-            alert.fadeIn();
+            resetAlert();
+            showAlert( response );
 
         });
 
@@ -69,11 +54,37 @@ jQuery(function(){
 
         var data = {
             'action': 'complete_transaction',
-            'transaction_id': jQuery( this ).find( 'input[name=transaction-id]' ).val()
+            'transaction_id': jQuery( this ).find( 'input[name=transaction_id]' ).val()
         }
 
         jQuery.post( ajax_object.ajax_url, data, function( response ) {
             
+            response = JSON.parse( response );
+            resetAlert();
+            showAlert( response );
+
+        }).done( function() {
+            jQuery( '#confirm-complete' ).hide();
+        });;
+
+    });
+    
+    jQuery( '.cancel-transaction' ).submit( function(e) {
+        e.preventDefault();
+
+        var data = {
+            'action': 'cancel_transaction',
+            'transaction_id': jQuery( this ).find( 'input[name=transaction_id]' ).val()
+        }
+
+        jQuery.post( ajax_object.ajax_url, data, function( response ) {
+            
+            response = JSON.parse( response );
+            resetAlert();
+            showAlert( response );
+
+        }).done( function() {
+            jQuery( '#confirm-cancel' ).hide();
         });
 
     });
@@ -98,6 +109,8 @@ function initiateForms( transaction_id ) {
 
     jQuery.post( ajax_object.ajax_url, data, function( response ) {
 
+
+
         if( response == 'false' ) {
 
             jQuery('.assign-tracking-no input#tracking-no').prop('disabled', false);
@@ -107,7 +120,10 @@ function initiateForms( transaction_id ) {
 
             jQuery('.assign-tracking-no input#tracking-no').prop('disabled', true);
             jQuery('.assign-tracking-no .assign-btn').prop('disabled', true);
+
+            resetAlert();
             jQuery('.assign-tracking-no .alert').addClass('alert-info');
+            jQuery('.assign-tracking-no .alert').text('A tracking number is already assigned for this transaction');
             jQuery('.assign-tracking-no .alert').show();
 
         }
@@ -116,10 +132,49 @@ function initiateForms( transaction_id ) {
 
 }
 
+function showAlert( response ) {
+    var alert = jQuery('.assign-tracking-no .alert');
+
+    switch( response.status ) {
+        case 'error': 
+            alert.addClass( 'alert-danger' );
+            break;
+        case 'fail': 
+            alert.addClass( 'alert-warning' );
+            break;
+        case 'success': 
+            alert.addClass( 'alert-success' );
+            break;
+    }
+
+    alert.text( response.msg );
+    alert.fadeIn();
+}
+
 function resetAlert() {
+
     var alert = jQuery('.assign-tracking-no .alert');
     alert.hide();
     alert.text("");
     alert.removeClass("alert-success alert-warning alert-danger alert-info");
+
+}
+
+function disableAssignTrackingNo() {
+
+    jQuery('.assign-tracking-no input#tracking-no').prop('disabled', true);
+    jQuery('.assign-tracking-no .assign-btn').prop('disabled', true);
+
+}
+
+function disableCompleteButton() {
+
+    jQuery('.complete-transaction .complete-btn').prop('disabled', true);
+
+}
+
+function disableCancelButton() {
+
+    jQuery('.cancel-transaction .cancel-btn').prop('disabled', true);
 
 }

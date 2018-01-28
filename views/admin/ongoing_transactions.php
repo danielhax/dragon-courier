@@ -72,9 +72,9 @@
 
 </div>
 
-<!-- Modal -->
-<div class="modal fade" id="transactionsModal" role="dialog">
-    <div class="modal-dialog modal-md">
+<!-- Actions Modal -->
+<div class="modal fade modal-md" id="transactionsModal" role="dialog">
+    <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal">&times;</button>
@@ -93,21 +93,57 @@
                         </span>
                     </div>
                 </form>
-                <form method="post" class="complete-transaction action-form">
-                    <input type="hidden" name="transaction_id" class="transaction_id">
-                    <h4>Set as Completed</h4>
-                    <button class="btn btn-success complete-btn">Complete Transaction</button>
-                    </div>
-                </form>
-                <form method="post" class="cancel-transaction action-form">
-                    <input type="hidden" name="transaction_id" class="transaction_id">
-                    <h4>Set as Cancelled</h4>
-                    <button class="btn btn-success cancel-btn">Cancel Transaction</button>
-                </form>
+                <h4>Set as Completed</h4>
+                <button class="btn btn-success complete-btn" data-toggle="modal" data-target="#confirm-complete">Complete Transaction</button>
+                <h4>Set as Cancelled</h4>
+                <button class="btn btn-danger cancel-btn" data-toggle="modal" data-target="#confirm-cancel">Cancel Transaction</button>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
             </div>
         </div>
     </div>
-  </div>
+</div>
+
+<!-- Confirm Complete -->
+
+<div class="modal fade" id="confirm-complete" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-sm">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Confirm Complete</h4>
+            </div>
+            <div class="modal-body">
+                Are you sure you want to complete this transaction?
+                <form method="post" class="complete-transaction action-form">
+                    <input type="hidden" name="transaction_id" class="transaction_id">
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-success">Complete Transaction</button>
+                </form>
+                <button type="button" class="btn btn-default btn-ok" data-dismiss="modal">Cancel</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Confirm Delete -->
+<div class="modal fade" id="confirm-cancel" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-sm">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Confirm Cancel</h4>
+            </div>
+            <div class="modal-body">
+                Are you sure you want to cancel this transaction?
+                <form method="post" class="cancel-transaction action-form">
+                    <input type="hidden" name="transaction_id" class="transaction_id">
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-danger">Cancel Transaction</button>
+                </form>
+                <button type="button" class="btn btn-default btn-ok" data-dismiss="modal">Cancel</button>
+            </div>
+        </div>
+    </div>
+</div>

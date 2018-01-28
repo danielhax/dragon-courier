@@ -38,9 +38,7 @@ class DragonCourier {
     function __construct() {
 
         $this->register_admin_pages();
-
         $this->register_scripts();
-
         $this->register_short_codes();
 
         if( class_exists( 'DragonDB' ) ) {
@@ -79,7 +77,10 @@ class DragonCourier {
 
     function enqueue_user_scripts() {
 
+        //styles
         wp_enqueue_style( 'user_style', plugins_url( '/css/user-style.css', __FILE__ ) );
+        //scripts
+        wp_enqueue_script( 'user_custom_script', plugins_url( '/js/user.js', __FILE__), array('jquery'), null );
 
     }
 
@@ -94,10 +95,6 @@ class DragonCourier {
         flush_rewrite_rules( );
 
     }
-
-    // function custom_post_type() {
-    //     register_post_type( 'shipping', ['public' => true, 'label' => 'Shipping'] );
-    // }
 
     private function register_admin_pages(){
 
@@ -129,16 +126,6 @@ class DragonCourier {
         require_once plugin_dir_path( __FILE__ ) . 'views/admin/index.php';
 
     }
-
-    // function register_session() {
-
-    //     if( !session_id() ) {
-
-    //         session_start();
-
-    //     }
-
-    // }
 
 }
 

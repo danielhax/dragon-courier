@@ -12,7 +12,7 @@ class DragonDB {
         add_action( 'wp_ajax_update_tracking_no', array( $this, 'update_tracking_no' ) );
         add_action( 'wp_ajax_tracking_no_assigned', array( $this, 'tracking_no_assigned' ) );
         add_action( 'wp_ajax_complete_transaction', array( $this, 'complete_transaction' ) );
-        add_action( 'wp_ajax_cancel_transaction', array( $this, 'tracking_cancel_transaction' ) );
+        add_action( 'wp_ajax_cancel_transaction', array( $this, 'cancel_transaction' ) );
 
     }
 
@@ -198,9 +198,82 @@ class DragonDB {
 
     function complete_transaction() {
 
+        /*
+         *
+         * Changes a transaction's status to "Completed"
+         * 
+         */
+
+        if( !isset( $_POST['transaction_id'] ) ) {
+
+            echo json_encode(array( 'status' => 'error', 'msg' => 'Illegal action call' ));
+            wp_die();
+
+        }
+
         global $wpdb;
 
-        
+        $id = $_POST['transaction_id'];
+
+        $result = $wpdb->update( $this->get_table_name(),
+                                array(
+                                    'status' => 'Completed',
+                                    'complete_date' => current_time('mysql')
+                                ),
+                                array('id' => $id),
+                                array(
+                                    '%s',
+                                    '%s')
+                                );
+
+        if( $result === false ) {
+
+            echo json_encode( array( 'status' => 'error', 'msg' => 'An errorr occured while updating transaction status.'));
+            wp_die();
+
+        }
+
+        echo json_encode( array( 'status' => 'success', 'msg' => 'Transaction completed!') );
+        wp_die();
+
+    }
+
+    function cancel_transaction() {
+
+        /*
+         *
+         * Changes a transaction's status to "Cancelled"
+         * 
+         */
+
+        if( !isset( $_POST['transaction_id'] ) ) {
+
+            echo json_encode(array( 'status' => 'error', 'msg' => 'Illegal action call' ));
+            wp_die();
+
+        }
+
+        global $wpdb;
+
+        $id = $_POST['transaction_id'];
+
+        $result = $wpdb->update( $this->get_table_name(),
+                                array(
+                                    'status' => 'Cancelled'
+                                ),
+                                array('id' => $id),
+                                    '%s'
+                                );
+
+        if( $result === false ) {
+
+            echo json_encode( array( 'status' => 'error', 'msg' => 'An errorr occured while updating transaction status.'));
+            wp_die();
+
+        }
+
+        echo json_encode( array( 'status' => 'success', 'msg' => 'Transaction cancelled!'));
+        wp_die();
 
     }
 
@@ -213,10 +286,21 @@ class DragonDB {
          */
 
         global $wpdb;
+        $tname = $this->get_table_name();
+        $tmeta = $wpdb->prefix . 'usermeta';
 
-        $result = $wpdb->get_results( "SELECT * FROM {$this->get_table_name()} WHERE status='Completed' OR status='Cancelled'", ARRAY_A );
+        $result = $wpdb->get_results( "SELECT * FROM {$tname} WHERE status = 'Completed' OR status = 'Cancelled'",
+                    ARRAY_A);
+
+        if( count( $result ) > 0) {
+
+            $result = $this->merge_meta($result);
+
+        }
 
         return $result;
+
+        wp_die();
 
     }
 
@@ -262,7 +346,7 @@ class DragonDB {
         $tname = $this->get_table_name();
         $tmeta = $wpdb->prefix . 'usermeta';
 
-        $result = $wpdb->get_results( "SELECT * FROM {$tname} WHERE status != 'Completed'",
+        $result = $wpdb->get_results( "SELECT * FROM {$tname} WHERE status = 'Pending' OR status = 'Dispatched'",
                     ARRAY_A);
 
         if( count( $result ) > 0) {

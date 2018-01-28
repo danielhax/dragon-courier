@@ -1,12 +1,60 @@
-span.required {
-    color: red;
+.home-banner-buttons {
+    padding-top: 10px !important;
+    padding-left: 70px !important;
 }
+
+.home-banner-buttons button{
+    display: inline-block;
+    text-align: center !important;
+    padding: 15px;
+    font-weight: 700;
+    width: 200px;
+    min-width: 150px !important;
+    margin: 0 20px;
+    border-color: black;
+    border-width: 0px;
+    border-radius: 5px;
+}
+
+.home-banner-buttons button:hover {
+    color: #FFFF7D;
+}
+
+.sign-up-btn {
+    background-color: #5870FF;
+}
+
+.track-btn {
+    background-color: #FF274A;
+}
+
 .delivery-form {
     display: block;
     margin: 0 auto;
-    max-width: 40%;
+}
+
+.delivery-form p {
+    color: red;
+    font-style: italic;
+}
+
+span.required {
+    color: red;
 }
 
 #dimensions input {
     width: 120px;
+}
+
+.pick-up-schedule-btn {
+    float: right;
+}
+
+.delivery-option-label {
+    color: black;
+    font-size: 14px !important;
+}
+
+.same-day-checkbox {
+    padding: 30px 0;
 }
