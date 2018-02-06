@@ -2,8 +2,28 @@
     <!-- <input type="hidden" name="action" value="schedule_delivery"> -->
     <?php wp_nonce_field( 'pickup_schedule' ); ?>
     <div class="row">
-        <div class="col col-md-6">
+        <div class="col col-md-4 col-sm-12">
+            <div class="row">
+                <h3>Select Date of Pickup</h3>
+
+                <div class="input-group date" id="pickup-datetimepicker">
+                    <input type="text" class="form-control">
+                    <div class="input-group-addon">
+                        <span class="glyphicon glyphicon-calendar"></span>
+                    </div>
+                </div>
+                <p class="note">NOTE: Cutoff time for Same Day delivery is 12:00am</p>
+            </div>
+            <div class="row">
+                <h3>Select Pickup Address</h3>
+
+                <?php include( ABSPATH . 'wp-content/plugins/dragon-courier/views/address_table.php'); ?>
+
+            </div>
+        </div>
+        <div class="col col-md-4 col-sm-12">
             <h3>Recipient's Information</h3>
+
             <div class="form-group">
                 <label for="r_first_name">First Name<span class="required">*</span></label>
                 <input type="text" class="form-control" name="r_first_name" id="r_first_name" placeholder="First Name" required value="Example">
@@ -14,26 +34,37 @@
             </div>
             <div class="form-group">
                 <label for="r_address">Street Address<span class="required">*</span></label>
-                <input type="text" class="form-control" name="r_address" id="r_address" placeholder="Street Address" required value="Example">
+                <input type="text" class="form-control" name="r_address" id="r_address" placeholder="House No., Street, Condo/Village/Subdivision" required value="Example">
             </div>
             <div class="row form-group">
-                <div class="col-md-4">
+                <div class="col-md-6">
+                    <label for="r_barangay">Barangay<span class="required">*</span></label>
+                    <input type="text" class="form-control" name="r_barangay" id="r_barangay" placeholder="Barangay" required value="Example">
+                </div>
+                <div class="col-md-6">
                     <label for="r_city">City<span class="required">*</span></label>
                     <input type="text" class="form-control" name="r_city" id="r_city" placeholder="City" required value="Example">
                 </div>
-                <div class="col-md-4">
-                    <label for="r_brgy">Barangay<span class="required">*</span></label>
-                    <input type="text" class="form-control" name="r_brgy" id="r_brgy" placeholder="Barangay" required value="Example">
+            </div>
+            <div class="form-group">
+                <label for="r_region">Region</label>
+                <select name="r_region" class="form-control" id="r_region">
+                    <option value="Metro Manila">Metro Manila</option>
+                    <option value="Provincial Luzon">Provincial Luzon</option>
+                    <option value="Visayas/Mindanao">Visayas/Mindanao</option>
+                </select>
+                <div class="pl-selected hide">
+                    <p class="note">3 to 4 Days Estimated Time of Delivery</p>
                 </div>
-                <div class="col-md-4">
-                    <label for="r_postal">Postal Code<span class="required">*</span></label>
-                    <input type="text" class="form-control" name="r_postal" id="r_postal" placeholder="Postal Code" required value="12345">
+
+                <div class="vm-selected hide">
+                    <p class="note">5 to 6 Days Estimated Time of Delivery</p>
                 </div>
             </div>
             <div class="row form-group">
                 <div class="col-md-6">
                     <label for="r_mobile_no">Mobile Number<span class="required">*</span></label>
-                    <input type="text" class="form-control" name="r_mobile_no" id="r_mobile_no" placeholder="Mobile No." required value="+639274817290">
+                    <input type="text" class="form-control" name="r_mobile_no" id="r_mobile_no" placeholder="e.g. +639271234567" required value="+639274817290">
                 </div>
                 <div class="col-md-6">
                     <label for="r_email">Email Address: </label>
@@ -42,17 +73,18 @@
             </div>
         </div>
 
-        <div class="col col-md-6">
-            <h3>Delivery Information</h3>
-            <div class="form-group">
-                <label for="delivery_types">Delivery Type</label>
-                <select class="form-control" id="delivery_types" class="delivery_types">
-                    <option>Metro Manila (Same Day Delivery)</option>
-                    <option>Metro Manila (2 Days)</option>
-                    <option>Luzon</option>
-                    <option>Visayas/Mindanao</option>
-                </select>
+        <div class="col col-md-4 col-sm-12">
+            <h3>Delivery Options</h3>
+
+            <div class="form-group mm-selected">
+                <label class="radio-inline delivery-option-label">
+                    <input type="radio" name="mm-same-day" value="true" checked>Same Day Delivery
+                </label>
+                <label class="radio-inline delivery-option-label">
+                    <input type="radio" name="mm-same-day" value="false">Regular Delivery (2 Days)
+                </label>
             </div>
+
             <div class="form-group">
                 <label class="radio-inline delivery-option-label">
                     <input type="radio" name="delivery-option" value="unlimited" checked>Unlimited Weight
@@ -63,7 +95,7 @@
             </div>
 
             <div class="unlimited-selected">
-                <p>Please make sure your item is no more than 12" x 18" in dimensions</p>
+                <p class="note">Please make sure your item is no more than 12" x 18" in dimensions</p>
             </div>
 
             <div class="own-selected form-group hide">
@@ -74,13 +106,62 @@
 
             <div class="form-group">
                 <label for="pkg_cost">Total Cost</label>
-                <input type="number" class="form-control" name="pkg_cost" id="pkg_cost" class="pkg_cost" value="148" readonly>
+                <input type="number" class="form-control" name="pkg_cost" id="pkg_cost" class="pkg_cost" value="188" readonly>
             </div>
 
             <button type="submit" name="pickup_schedule_submit" class="btn btn-default pick-up-schedule-btn">Submit</button>
         </div>
     </div>
 </form>
+
+<script>
+    var initialHour = {};
+
+    jQuery( function(){
+
+        initialHour = moment().hour();
+
+        jQuery('#pickup-datetimepicker').datetimepicker({
+            format: 'DD/MM/YYYY',
+            minDate: moment().add( getMinDay(), 'days')
+        });
+
+        var checkIfCutoff = setInterval( function() {
+            console.log( "Initial: " + initialHour + " Current: " + moment().hour() + " -- " + isNextHour() );
+            if( isNextHour() ) {
+
+                jQuery('#pickup-datetimepicker').data("DateTimePicker").minDate( moment().add( getMinDay(), 'days') );
+                initialHour = moment().hour();
+
+            }
+        }, 1000);
+
+    });
+
+    //returns true of current time is past 11:59 am
+    function isCutOff(){
+
+        return moment().hour() >= 12;
+
+    }
+
+    //check if the hour changed
+    function isNextHour() {
+
+        return initialHour != moment().hour();
+
+    }
+
+    //if cutoff, set schedule for next day
+    function getMinDay(){
+
+        if( isCutOff() ) return 2;
+
+        return 1;
+
+    }
+
+</script>
 
 <?php 
 

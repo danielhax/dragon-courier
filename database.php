@@ -7,7 +7,8 @@ class DragonDB {
 
     private function __construct() {
 
-        $this->create_db();
+        $this->create_main_db();
+        $this->create_address_db();
 
         add_action( 'wp_ajax_update_tracking_no', array( $this, 'update_tracking_no' ) );
         add_action( 'wp_ajax_tracking_no_assigned', array( $this, 'tracking_no_assigned' ) );
@@ -30,29 +31,43 @@ class DragonDB {
 
     }
 
-    private function get_table_name(){
+    private function main_table_name(){
 
         global $wpdb;
         return $wpdb->prefix . 'dragon_courier';
 
     }
 
-    private function table_exists() {
+    private function address_table_name(){
 
         global $wpdb;
-        return $wpdb->get_var( "SHOW TABLES LIKE '{$this->get_table_name()}'" ) == $this->get_table_name();
+        return $wpdb->prefix . 'dragon_courier_addresses';
 
     }
 
-    function create_db() {
+    private function main_table_exists() {
+
+        global $wpdb;
+        return $wpdb->get_var( "SHOW TABLES LIKE '{$this->main_table_name()}'" ) == $this->main_table_name();
+
+    }
+
+    private function address_table_exists() {
+
+        global $wpdb;
+        return $wpdb->get_var( "SHOW TABLES LIKE '{$this->address_table_name()}'" ) == $this->address_table_name();
+
+    }
+
+    function create_main_db() {
         
-        if(!$this->table_exists()) {
+        if(!$this->main_table_exists()) {
 
             global $wpdb;
 
             $charset_collate = $wpdb->get_charset_collate();
 
-            $sql = "CREATE TABLE {$this->get_table_name()} (
+            $sql = "CREATE TABLE {$this->main_table_name()} (
                 id bigint(20) NOT NULL AUTO_INCREMENT,
                 user_id bigint(20) NOT NULL,
                 schedule_date datetime DEFAULT '0000-00-00 00:00:00' NOT NULL,
@@ -65,7 +80,7 @@ class DragonDB {
                 r_address varchar(255) NOT NULL,
                 r_barangay varchar(100) NOT NULL,
                 r_city varchar(100) NOT NULL,
-                r_postal varchar(5) NOT NULL,
+                r_region varchar(100) NOT NULL,
                 r_mobile_no varchar(13) NOT NULL,
                 r_email varchar(100),
                 pkg_weight float(5, 1) NOT NULL,
@@ -73,10 +88,39 @@ class DragonDB {
                 pkg_width float(5, 1) NOT NULL,
                 pkg_height float(5, 1) NOT NULL,
                 pkg_cost float(5, 1) DEFAULT '0.0',
+                remarks text,
                 status varchar(50) DEFAULT 'Pending',
                 PRIMARY KEY  (id),
                 FOREIGN KEY  (user_id) REFERENCES wp_users(ID),
                 UNIQUE (tracking_no)
+            ) $charset_collate;";
+
+            require_once( ABSPATH . '/wp-admin/includes/upgrade.php' );
+            dbDelta( $sql );
+
+            wp_die();
+
+        }
+
+    }
+
+    function create_address_db() {
+
+        if(!$this->address_table_exists()) {
+
+            global $wpdb;
+
+            $charset_collate = $wpdb->get_charset_collate();
+
+            $sql = "CREATE TABLE {$this->address_table_name()} (
+                id bigint(20) NOT NULL AUTO_INCREMENT,
+                user_id bigint(20) NOT NULL,
+                address varchar(255) NOT NULL,
+                barangay varchar(100) NOT NULL,
+                city varchar(100) NOT NULL,
+                region varchar(100) NOT NULL,
+                PRIMARY KEY  (id),
+                FOREIGN KEY  (user_id) REFERENCES wp_users(ID)
             ) $charset_collate;";
 
             require_once( ABSPATH . '/wp-admin/includes/upgrade.php' );
@@ -98,13 +142,13 @@ class DragonDB {
 
         global $wpdb;
 
-        $wpdb->insert( $this->get_table_name(), array(
+        $wpdb->insert( $this->main_table_name(), array(
             'user_id' => get_current_user_id(),
             'schedule_date' => current_time('mysql'),
             'r_first_name' => $_POST['r_first_name'],
             'r_last_name' => $_POST['r_last_name'],
             'r_address' => $_POST['r_address'],
-            'r_barangay' => $_POST['r_brgy'],
+            'r_barangay' => $_POST['r_barangay'],
             'r_city' => $_POST['r_city'],
             'r_postal' => $_POST['r_postal'],
             'r_mobile_no' => $_POST['r_mobile_no'],
@@ -167,7 +211,7 @@ class DragonDB {
 
         if( $tracking_no == null || $tracking_no == '') {
 
-            $result = $wpdb->update( $this->get_table_name(),                             //table
+            $result = $wpdb->update( $this->main_table_name(),                             //table
                                     array(                                                //column=>value
                                         'tracking_no' => $_POST['tracking-no'],
                                         'status' => 'Dispatched'),     
@@ -215,7 +259,7 @@ class DragonDB {
 
         $id = $_POST['transaction_id'];
 
-        $result = $wpdb->update( $this->get_table_name(),
+        $result = $wpdb->update( $this->main_table_name(),
                                 array(
                                     'status' => 'Completed',
                                     'complete_date' => current_time('mysql')
@@ -257,7 +301,7 @@ class DragonDB {
 
         $id = $_POST['transaction_id'];
 
-        $result = $wpdb->update( $this->get_table_name(),
+        $result = $wpdb->update( $this->main_table_name(),
                                 array(
                                     'status' => 'Cancelled'
                                 ),
@@ -286,7 +330,7 @@ class DragonDB {
          */
 
         global $wpdb;
-        $tname = $this->get_table_name();
+        $tname = $this->main_table_name();
         $tmeta = $wpdb->prefix . 'usermeta';
 
         $result = $wpdb->get_results( "SELECT * FROM {$tname} WHERE status = 'Completed' OR status = 'Cancelled'",
@@ -307,7 +351,7 @@ class DragonDB {
     function get_tracking_no( $id ) {
 
         global $wpdb;
-        $tracking_no = $wpdb->get_var( "SELECT tracking_no FROM {$this->get_table_name()} WHERE id='{$id}'");
+        $tracking_no = $wpdb->get_var( "SELECT tracking_no FROM {$this->main_table_name()} WHERE id='{$id}'");
 
         return $tracking_no;
 
@@ -316,7 +360,7 @@ class DragonDB {
     function tracking_no_used( $tracking_no ) {
 
         global $wpdb;
-        $count = $wpdb->get_var( "SELECT COUNT(*) FROM {$this->get_table_name()} WHERE tracking_no='{$tracking_no}'" );
+        $count = $wpdb->get_var( "SELECT COUNT(*) FROM {$this->main_table_name()} WHERE tracking_no='{$tracking_no}'" );
 
         if( $count == null || $count == 0 ) return false;
 
@@ -343,7 +387,7 @@ class DragonDB {
     function get_incomplete_transactions() {
 
         global $wpdb;
-        $tname = $this->get_table_name();
+        $tname = $this->main_table_name();
         $tmeta = $wpdb->prefix . 'usermeta';
 
         $result = $wpdb->get_results( "SELECT * FROM {$tname} WHERE status = 'Pending' OR status = 'Dispatched'",

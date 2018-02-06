@@ -33,8 +33,14 @@
     margin: 0 auto;
 }
 
-.delivery-form p {
+.delivery-form p.note {
     color: red;
+    font-size: 12px;
+    font-style: italic;
+}
+
+.delivery-form p.info {
+    color: lightblue;
     font-style: italic;
 }
 
@@ -57,4 +63,25 @@ span.required {
 
 .same-day-checkbox {
     padding: 30px 0;
+}
+
+#newAddressModal {
+
+    margin: 200px auto 0px auto;
+
+}
+
+#newAddressModal select {
+
+    box-sizing: border-box;
+
+}
+
+.pickup-address-table button.new-address-btn {
+
+    border-color: green;
+    color: green;
+    display: block;
+    margin: 0 auto;
+
 }
