@@ -85,3 +85,8 @@ span.required {
     margin: 0 auto;
 
 }
+
+.remarks {
+    height: 200px;
+    margin-bottom: 10px;
+}

@@ -118,6 +118,7 @@ class DragonCourier {
         ob_start();
         
         include( ABSPATH . 'wp-content/plugins/dragon-courier/views/address_table.php');
+        include( ABSPATH . 'wp-content/plugins/dragon-courier/views/new_address_modal.php');
         
         $output .= ob_get_contents();
         ob_end_clean();

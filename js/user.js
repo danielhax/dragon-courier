@@ -1,16 +1,18 @@
 jQuery( function() {
 
-    jQuery( 'input[type=radio][name="delivery-option"]' ).change( function() {
+    jQuery( 'input[type=radio][name="delivery_option"]' ).change( function() {
 
-        if( this.value == 'own' ) {
+        if( this.value == 'Own' ) {
 
             jQuery( '.unlimited-selected ').addClass( 'hide' );
             jQuery( '.own-selected ').removeClass( 'hide' );
+            jQuery( '#pkg_weight' ).prop('disabled', false);
 
-        } else if ( this.value == 'unlimited' ) {
+        } else if ( this.value == 'Unlimited' ) {
 
             jQuery( '.own-selected ').addClass( 'hide' );
             jQuery( '.unlimited-selected ').removeClass( 'hide' );
+            jQuery( '#pkg_weight' ).prop('disabled', true);
 
         }
 
@@ -28,17 +30,23 @@ jQuery( function() {
             jQuery( '.vm-selected' ).addClass( 'hide' );
             jQuery( '.mm-selected' ).removeClass( 'hide' );
 
+            jQuery( '.mm-selected input' ).prop('disabled', false);
+
         }  else if( option.val() == 'Provincial Luzon' ) {
 
             jQuery( '.vm-selected' ).addClass( 'hide' );
             jQuery( '.mm-selected' ).addClass( 'hide' );
             jQuery( '.pl-selected' ).removeClass( 'hide' );
 
+            jQuery( '.mm-selected input' ).prop('disabled', true);
+
         } else if( option.val() == 'Visayas/Mindanao' ) {
 
             jQuery( '.pl-selected' ).addClass( 'hide' );
             jQuery( '.mm-selected' ).addClass( 'hide' );
             jQuery( '.vm-selected' ).removeClass( 'hide' );
+
+            jQuery( '.mm-selected input' ).prop('disabled', true);
 
         }
     });

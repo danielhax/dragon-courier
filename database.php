@@ -70,11 +70,13 @@ class DragonDB {
             $sql = "CREATE TABLE {$this->main_table_name()} (
                 id bigint(20) NOT NULL AUTO_INCREMENT,
                 user_id bigint(20) NOT NULL,
-                schedule_date datetime DEFAULT '0000-00-00 00:00:00' NOT NULL,
+                date_submitted datetime DEFAULT '0000-00-00 00:00:00' NOT NULL,
+                schedule_date datetime DEFAULT '0000-00-00' NOT NULL,
                 pickup_date datetime,
                 dispatch_date datetime,
                 complete_date datetime,
                 tracking_no varchar(12),
+                pickup_address bigint(20) NOT NULL,
                 r_first_name varchar(100) NOT NULL,
                 r_last_name varchar(100) NOT NULL,
                 r_address varchar(255) NOT NULL,
@@ -83,15 +85,15 @@ class DragonDB {
                 r_region varchar(100) NOT NULL,
                 r_mobile_no varchar(13) NOT NULL,
                 r_email varchar(100),
-                pkg_weight float(5, 1) NOT NULL,
-                pkg_length float(5, 1) NOT NULL,
-                pkg_width float(5, 1) NOT NULL,
-                pkg_height float(5, 1) NOT NULL,
+                pkg_weight float(5, 1),
                 pkg_cost float(5, 1) DEFAULT '0.0',
+                option_1 varchar(50) DEFAULT 'Regular',
+                option_2 varchar(50) NOT NULL,
                 remarks text,
                 status varchar(50) DEFAULT 'Pending',
                 PRIMARY KEY  (id),
                 FOREIGN KEY  (user_id) REFERENCES wp_users(ID),
+                FOREIGN KEY  (pickup_address) REFERENCES {$this->address_table_name()}(id),
                 UNIQUE (tracking_no)
             ) $charset_collate;";
 
@@ -141,24 +143,54 @@ class DragonDB {
         }
 
         global $wpdb;
+        /**
+         *      Same Day Delivery (Option 1) and User-inputted weight 
+         *      depends on delivery options, sometimes they're disabled
+         */
+        $option_1 = '';
+        $weight = '';
+        if ( isset( $_POST['mm-same-day'] ) ) {
 
-        $wpdb->insert( $this->main_table_name(), array(
+            $option_1 = $_POST['mm-same-day'];
+
+        } else {
+
+            $option_1 = 'Regular';
+
+        }
+
+        if ( isset( $_POST['pkg_weight']) ) {
+
+            $weight = $_POST['pkg_weight'];
+
+        } else {
+
+            $weight = 0;
+
+        }
+
+        $result = $wpdb->insert( $this->main_table_name(), array(
             'user_id' => get_current_user_id(),
-            'schedule_date' => current_time('mysql'),
+            'date_submitted' => current_time('mysql'),
+            'schedule_date' => $_POST['pickup_date'],
+            'pickup_address' => $_POST['pickup_address'],
             'r_first_name' => $_POST['r_first_name'],
             'r_last_name' => $_POST['r_last_name'],
             'r_address' => $_POST['r_address'],
             'r_barangay' => $_POST['r_barangay'],
             'r_city' => $_POST['r_city'],
-            'r_postal' => $_POST['r_postal'],
+            'r_region' => $_POST['r_region'],
             'r_mobile_no' => $_POST['r_mobile_no'],
             'r_email' => $_POST['r_email'],
-            'pkg_weight' => $_POST['pkg_weight'],
-            'pkg_length' => $_POST['pkg_length'],
-            'pkg_width' => $_POST['pkg_width'],
-            'pkg_height' => $_POST['pkg_height'],
-            'pkg_cost' => $_POST['pkg_cost']
+            'pkg_weight' => $weight,
+            'pkg_cost' => $_POST['pkg_cost'],
+            'option_1' => $option_1,
+            'option_2' => $_POST['delivery_option'],
+            'remarks' => $_POST['remarks']
         ), array(
+            '%d',
+            '%s',
+            '%s',
             '%d',
             '%s',
             '%s',
@@ -168,18 +200,45 @@ class DragonDB {
             '%s',
             '%s',
             '%s',
+            '%f',
+            '%f',
             '%s',
-            '%f',
-            '%f',
-            '%f',
-            '%f',
-            '%f'
+            '%s',
+            '%s'
         ));
 
-        //echo $wpdb->show_errors();
+        if ( $result === false ){ 
 
-        $url = wp_nonce_url( home_url( 'success-page' ), 'post_sched' );
-        wp_redirect( $url );
+            $wpdb->print_error(); 
+
+        } else {
+
+            $url = wp_nonce_url( home_url( 'success-page' ), 'post_sched' );
+            wp_redirect( $url );
+
+        }
+
+    }
+
+    function insert_new_address() {
+
+        if( !wp_verify_nonce( $_POST['_wpnonce'], 'new_address') ) {
+
+            wp_die('Nonce could not be verified!');
+
+        }
+
+        global $wpdb;
+
+        $wpdb->insert( $this->address_table_name(), array(
+            'user_id' => get_current_user_id(),
+            'address' => $_POST['address'],
+            'barangay' => $_POST['barangay'],
+            'city' => $_POST['city'],
+            'region' => $_POST['region']
+        ));
+
+        wp_redirect( $_SERVER['HTTP_REFERER'] );
 
     }
 
@@ -321,6 +380,19 @@ class DragonDB {
 
     }
 
+    function get_addresses() {
+
+        global $wpdb;
+
+        $id = get_current_user_id();
+
+        $result = $wpdb->get_results( "SELECT * FROM {$this->address_table_name()} WHERE user_id={$id}",
+                    ARRAY_A);
+
+        return $result;
+        wp_die();
+    }
+
     function get_transaction_archive() {
 
         /*
@@ -412,10 +484,8 @@ class DragonDB {
         $result = $wpdb->get_results( "SELECT meta_key, meta_value FROM wp_usermeta 
                                     WHERE user_id = " . $user_id . " AND meta_key = 'first_name' 
                                     OR user_id = " . $user_id . " AND meta_key = 'last_name'
-                                    OR user_id = " . $user_id . " AND meta_key = 'street_address'
-                                    OR user_id = " . $user_id . " AND meta_key = 'barangay'
-                                    OR user_id = " . $user_id . " AND meta_key = 'city'
-                                    OR user_id = " . $user_id . " AND meta_key = 'postal_code'",  ARRAY_A );
+                                    OR user_id = " . $user_id . " AND meta_key = 'middle_initial'
+                                    OR user_id = " . $user_id . " AND meta_key = 'mobile_number'",  ARRAY_A );
 
         return $result;
 

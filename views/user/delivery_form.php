@@ -7,7 +7,7 @@
                 <h3>Select Date of Pickup</h3>
 
                 <div class="input-group date" id="pickup-datetimepicker">
-                    <input type="text" class="form-control">
+                    <input type="text" name="pickup_date" class="form-control">
                     <div class="input-group-addon">
                         <span class="glyphicon glyphicon-calendar"></span>
                     </div>
@@ -78,19 +78,19 @@
 
             <div class="form-group mm-selected">
                 <label class="radio-inline delivery-option-label">
-                    <input type="radio" name="mm-same-day" value="true" checked>Same Day Delivery
+                    <input type="radio" name="mm-same-day" value="Same Day" checked>Same Day Delivery
                 </label>
                 <label class="radio-inline delivery-option-label">
-                    <input type="radio" name="mm-same-day" value="false">Regular Delivery (2 Days)
+                    <input type="radio" name="mm-same-day" value="Regular">Regular Delivery (2 Days)
                 </label>
             </div>
 
             <div class="form-group">
                 <label class="radio-inline delivery-option-label">
-                    <input type="radio" name="delivery-option" value="unlimited" checked>Unlimited Weight
+                    <input type="radio" name="delivery_option" value="Unlimited" checked>Unlimited Weight
                 </label>
                 <label class="radio-inline delivery-option-label">
-                    <input type="radio" name="delivery-option" value="own">Own Packaging
+                    <input type="radio" name="delivery_option" value="Own">Own Packaging
                 </label>
             </div>
 
@@ -99,8 +99,8 @@
             </div>
 
             <div class="own-selected form-group hide">
-                <label for="additional_kg">Weight (kg)</label>
-                <input type="number" class="form-control" name="addition_kg" id="additional_kg" value="3">
+                <label for="pkg_weight">Weight (kg)</label>
+                <input type="number" class="form-control" name="pkg_weight" id="pkg_weight" value="3" disabled>
                 <h6 class="additional_kg_cost">Additional cost: ₱<span>0</span></h6>
             </div>
 
@@ -109,10 +109,16 @@
                 <input type="number" class="form-control" name="pkg_cost" id="pkg_cost" class="pkg_cost" value="188" readonly>
             </div>
 
+            <h3>Remarks</h3>
+            <textarea name="remarks" class="form-control remarks" cols="30" rows="5" placeholder="Optional"></textarea>
+
             <button type="submit" name="pickup_schedule_submit" class="btn btn-default pick-up-schedule-btn">Submit</button>
         </div>
     </div>
 </form>
+
+<!-- New Address Form Modal -->
+<?php include( ABSPATH . 'wp-content/plugins/dragon-courier/views/new_address_modal.php'); ?>
 
 <script>
     var initialHour = {};
@@ -122,7 +128,7 @@
         initialHour = moment().hour();
 
         jQuery('#pickup-datetimepicker').datetimepicker({
-            format: 'DD/MM/YYYY',
+            format: 'YYYY-DD-MM',
             minDate: moment().add( getMinDay(), 'days')
         });
 
