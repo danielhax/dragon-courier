@@ -7,7 +7,7 @@
                 <h4 class="modal-title">Add New Address</h4>
             </div>
             <div class="modal-body">
-                <form method="post" class="new-address-form">
+                <form action="" method="post" class="new-address-form">
                     <?php wp_nonce_field( 'new_address' ); ?>
                     <div class="form-group">
                         <label for="address">Street Address<span class="required">*</span></label>

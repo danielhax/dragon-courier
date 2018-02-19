@@ -24,8 +24,6 @@ jQuery( function() {
 
         if( option.val() == 'Metro Manila' ) {
 
-            //jQuery( '#pkg_cost' ).val(188);
-
             jQuery( '.pl-selected' ).addClass( 'hide' );
             jQuery( '.vm-selected' ).addClass( 'hide' );
             jQuery( '.mm-selected' ).removeClass( 'hide' );
@@ -65,5 +63,53 @@ jQuery( function() {
             } 
         }, 1);
     });
+
+    jQuery( '.schedule-nav button.next' ).click( function(){
+
+        jQuery( '.schedule-nav .next' ).css( 'visibility', 'hidden' );       
+
+        jQuery('.pickup-details').hide( 'slide', { direction: 'left' }, 1000, function(){
+            jQuery('.payment-details').removeClass( 'hide' ).show( 'slide', { direction: 'left' }, 1000 );
+            jQuery( '.schedule-nav .back' ).css( 'visibility', 'visible' ).removeClass( 'hide' );
+            jQuery( '.schedule-nav .pickup-schedule-btn' ).css( 'visibility', 'visible' ).removeClass( 'hide' ); 
+        });
+
+    });
+
+    jQuery( '.schedule-nav button.back' ).click( function(){
+
+        jQuery( '.schedule-nav .pickup-schedule-btn' ).css( 'visibility', 'hidden' );
+        jQuery( '.schedule-nav .back' ).css( 'visibility', 'hidden' );
+        
+        jQuery('.payment-details').hide( 'slide', {direction: 'right'}, 1000, function(){
+            jQuery('.pickup-details').show( 'slide', {direction: 'right'}, 1000);
+            jQuery( '.schedule-nav .next' ).css( 'visibility', 'visible' ).removeClass( 'hide' );
+        });
+
+    });
+
+    jQuery('form.delivery-form').submit( function(){
+        /**
+         * 
+         * Start validation upon pickup schedule form submit
+         * 
+         */
+        var pickup_radio = jQuery( 'input[name="pickup_address"]' );
+
+        if( pickup_radio.length ) {
+
+            return true;
+            
+        }
+
+        jQuery( '.payment-details' ).hide('slide', {direction: 'right'}, 1000, function(){
+            jQuery( '.pickup-details .alert' ).removeClass( 'hide' );
+            jQuery( '.pickup-details' ).show('slide', {direction: 'right'}, 1000);
+        }); 
+        
+
+        return false;
+    });
+
 
 });

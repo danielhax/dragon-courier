@@ -90,6 +90,8 @@ class DragonCourier {
         wp_enqueue_style( 'bootstrap', 'https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css');
         wp_enqueue_style( 'bootstrap-datetimepicker', plugins_url( '/bower_components/eonasdan-bootstrap-datetimepicker/build/css/bootstrap-datetimepicker.min.css', __FILE__ ));        
         //scripts
+        wp_enqueue_script( 'jquery_ui', 'https://code.jquery.com/ui/1.12.1/jquery-ui.min.js', array( 'jquery' ), true);
+        wp_enqueue_script( 'cost_calculator', plugins_url( '/js/cost_calculator.js', __FILE__), array( 'jquery' ) );
         wp_enqueue_script( 'user_custom_script', plugins_url( '/js/user.js', __FILE__), array( 'jquery' ), true );
 
     }
@@ -146,12 +148,19 @@ class DragonCourier {
     private function register_short_codes(){
 
         add_shortcode( 'dragon-delivery-form', array( $this, 'delivery_form_sc' ) );
+        add_shortcode( 'dragon-payments', array( $this, 'payments_sc') );
 
     }
 
     function delivery_form_sc(){
 
         include( plugin_dir_path( __FILE__ ) . "/views/user/delivery_form.php" );
+
+    }
+
+    function payments_sc(){
+
+        include( plugin_dir_path( __FILE__ ) . "/views/user/payments.php" );
 
     }
 

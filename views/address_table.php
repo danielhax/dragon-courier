@@ -5,7 +5,7 @@
  <?php 
     $db = DragonDB::getInstance() or die( "ERROR ACCESSING DATABASE!" );
 
-    $addresses = $db->get_addresses();
+    $addresses = $db->get_pickup_addresses();
  ?>
 
 <div class="pickup-address-table">

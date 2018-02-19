@@ -29,25 +29,25 @@ jQuery(function(){
 
     });
 
-    jQuery( '.assign-tracking-no' ).submit( function(e) {
+    // jQuery( '.assign-tracking-no' ).submit( function(e) {
 
-        e.preventDefault();
+    //     e.preventDefault();
 
-        var data = {
-            'action': 'update_tracking_no',
-            'transaction_id': jQuery( this ).find( 'input[name=transaction_id]' ).val(),
-            'tracking-no': jQuery( this ).find( 'input[name=tracking-no]' ).val()
-        }
+    //     var data = {
+    //         'action': 'update_tracking_no',
+    //         'transaction_id': jQuery( this ).find( 'input[name=transaction_id]' ).val(),
+    //         'tracking-no': jQuery( this ).find( 'input[name=tracking-no]' ).val()
+    //     }
 
-        jQuery.post( ajax_object.ajax_url, data, function( response ) {
+    //     jQuery.post( ajax_object.ajax_url, data, function( response ) {
             
-            response = JSON.parse( response );
-            resetAlert();
-            showAlert( response );
+    //         response = JSON.parse( response );
+    //         resetAlert();
+    //         showAlert( response );
 
-        });
+    //     });
 
-    });
+    // });
 
     jQuery( '.complete-transaction' ).submit( function(e) {
         e.preventDefault();
@@ -65,6 +65,7 @@ jQuery(function(){
 
         }).done( function() {
             jQuery( '#confirm-complete' ).hide();
+            location.reload(); 
         });;
 
     });
@@ -85,6 +86,7 @@ jQuery(function(){
 
         }).done( function() {
             jQuery( '#confirm-cancel' ).hide();
+            location.reload(); 
         });
 
     });
@@ -95,45 +97,46 @@ jQuery(function(){
 
 });
 
-function initiateForms( transaction_id ) {
+function initiateForms( user_id, transaction_id ) {
 
     //set form ID
+    jQuery( '.action-form .user_id' ).val( user_id );
     jQuery( '.action-form .transaction_id' ).val( transaction_id );
     //show ID on modal header
     jQuery( '#transactionsModal .title-id' ).text( transaction_id );
 
-    var data = {
-        'action': 'tracking_no_assigned',
-        'transaction_id': transaction_id
-    }
+    // var data = {
+    //     'action': 'tracking_no_assigned',
+    //     'transaction_id': transaction_id
+    // }
 
-    jQuery.post( ajax_object.ajax_url, data, function( response ) {
+    // jQuery.post( ajax_object.ajax_url, data, function( response ) {
 
 
 
-        if( response == 'false' ) {
+    //     if( response == 'false' ) {
 
-            jQuery('.assign-tracking-no input#tracking-no').prop('disabled', false);
-            jQuery('.assign-tracking-no .assign-btn').prop('disabled', false);
+    //         jQuery('.assign-tracking-no input#tracking-no').prop('disabled', false);
+    //         jQuery('.assign-tracking-no .assign-btn').prop('disabled', false);
 
-        } else {
+    //     } else {
 
-            jQuery('.assign-tracking-no input#tracking-no').prop('disabled', true);
-            jQuery('.assign-tracking-no .assign-btn').prop('disabled', true);
+    //         jQuery('.assign-tracking-no input#tracking-no').prop('disabled', true);
+    //         jQuery('.assign-tracking-no .assign-btn').prop('disabled', true);
 
-            resetAlert();
-            jQuery('.assign-tracking-no .alert').addClass('alert-info');
-            jQuery('.assign-tracking-no .alert').text('A tracking number is already assigned for this transaction');
-            jQuery('.assign-tracking-no .alert').show();
+    //         resetAlert();
+    //         jQuery('.assign-tracking-no .alert').addClass('alert-info');
+    //         jQuery('.assign-tracking-no .alert').text('A tracking number is already assigned for this transaction');
+    //         jQuery('.assign-tracking-no .alert').show();
 
-        }
+    //     }
 
-    });
+    // });
 
 }
 
 function showAlert( response ) {
-    var alert = jQuery('.assign-tracking-no .alert');
+    var alert = jQuery('div.alert');
 
     switch( response.status ) {
         case 'error': 

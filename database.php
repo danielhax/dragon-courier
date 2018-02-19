@@ -75,7 +75,7 @@ class DragonDB {
                 pickup_date datetime,
                 dispatch_date datetime,
                 complete_date datetime,
-                tracking_no varchar(12),
+                tracking_no varchar(16),
                 pickup_address bigint(20) NOT NULL,
                 r_first_name varchar(100) NOT NULL,
                 r_last_name varchar(100) NOT NULL,
@@ -90,6 +90,7 @@ class DragonDB {
                 option_1 varchar(50) DEFAULT 'Regular',
                 option_2 varchar(50) NOT NULL,
                 remarks text,
+                payment_type varchar(50),
                 status varchar(50) DEFAULT 'Pending',
                 PRIMARY KEY  (id),
                 FOREIGN KEY  (user_id) REFERENCES wp_users(ID),
@@ -169,10 +170,14 @@ class DragonDB {
 
         }
 
+        $trackingno = $this->generate_tracking_no();
+        $user_id = get_current_user_id();
+
         $result = $wpdb->insert( $this->main_table_name(), array(
-            'user_id' => get_current_user_id(),
+            'user_id' => $user_id,
             'date_submitted' => current_time('mysql'),
             'schedule_date' => $_POST['pickup_date'],
+            'tracking_no' => $trackingno,
             'pickup_address' => $_POST['pickup_address'],
             'r_first_name' => $_POST['r_first_name'],
             'r_last_name' => $_POST['r_last_name'],
@@ -186,11 +191,13 @@ class DragonDB {
             'pkg_cost' => $_POST['pkg_cost'],
             'option_1' => $option_1,
             'option_2' => $_POST['delivery_option'],
-            'remarks' => $_POST['remarks']
+            'remarks' => $_POST['remarks'],
+            'payment_type' => $_POST['payment']
         ), array(
             '%d',
             '%s',
             '%s',
+            '%s',
             '%d',
             '%s',
             '%s',
@@ -202,6 +209,7 @@ class DragonDB {
             '%s',
             '%f',
             '%f',
+            '%s',
             '%s',
             '%s',
             '%s'
@@ -213,7 +221,16 @@ class DragonDB {
 
         } else {
 
+            $points = get_user_meta( $user_id, 'dc_points', true );
+
+            if( $points == '' ) {
+
+                add_user_meta( $user_id, 'dc_points', 0, true );
+
+            }
+
             $url = wp_nonce_url( home_url( 'success-page' ), 'post_sched' );
+            $url .= '&tr=' . $trackingno;
             wp_redirect( $url );
 
         }
@@ -336,6 +353,8 @@ class DragonDB {
 
         }
 
+        $this->add_points( $_POST['user_id'], 1);
+
         echo json_encode( array( 'status' => 'success', 'msg' => 'Transaction completed!') );
         wp_die();
 
@@ -380,7 +399,7 @@ class DragonDB {
 
     }
 
-    function get_addresses() {
+    function get_pickup_addresses() {
 
         global $wpdb;
 
@@ -391,6 +410,22 @@ class DragonDB {
 
         return $result;
         wp_die();
+    }
+
+    function get_transaction_pickup_address($id) {
+
+        global $wpdb;
+
+        $result = $wpdb->get_row( "SELECT * FROM {$this->address_table_name()} WHERE id='{$id}'", ARRAY_A);
+
+        if( $result === null ) {
+
+            wp_die( "A database error occured when fetching the associated address" );
+
+        }
+
+        return $result;
+
     }
 
     function get_transaction_archive() {
@@ -417,6 +452,22 @@ class DragonDB {
         return $result;
 
         wp_die();
+
+    }
+
+    function generate_tracking_no() {
+
+        do {
+
+            $trackingno = '8350' . date( 's' );
+            $suffix = mt_rand(0, 9999);
+            $suffix = sprintf('%04d', $suffix);
+
+            $trackingno .= $suffix;
+
+        } while( $this->tracking_no_used( $trackingno ) );
+
+        return $trackingno;
 
     }
 
@@ -512,6 +563,32 @@ class DragonDB {
         }
 
         return $result;
+
+    }
+
+    function add_points( $id, $num ) {
+
+        global $wpdb;
+
+        $result = $wpdb->update( 'wp_usermeta',
+                                array(
+                                    'meta_value' => 'meta_value' + $num
+                                ),
+                                array(
+                                    'user_id' => $id,
+                                    'meta_key' => 'dc_points'
+                                ),
+                                '%d',
+                                array(
+                                    '%d',
+                                    '%s'
+                                ) );
+
+        if( $result === false ) {
+
+            wp_die( 'A database error occured while adding reward points ' );
+
+        }
 
     }
 }

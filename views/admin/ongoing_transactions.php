@@ -27,6 +27,7 @@
                     <th>Recipient's Name</th>
                     <th>Recipient's Address</th>
                     <th>Recipient's City</th>
+                    <th>Recipient's Region</th>
                     <th>Recipient's Mobile No.</th>
                     <th>Date Scheduled</th>
                     <th>Status</th>
@@ -34,7 +35,11 @@
                 </tr>
                 </thead>
                 <tbody>
-                    <?php foreach( $pending_transactions as $tr ) { ?>
+                    <?php foreach( $pending_transactions as $tr ) { 
+                        
+                        $address = $db->get_transaction_pickup_address( $tr['pickup_address'] );
+
+                        ?>
 
                         <tr class="<?= get_row_color($tr['status']); ?>">
                             <td><?= $tr['user_id'] ?></td>
@@ -52,15 +57,16 @@
                             
                             </td>
                             <td><?= $tr['last_name'] . ', ' . $tr['first_name'] ?></td>
-                            <td><?= $tr['street_address'] ?></td>
-                            <td><?= $tr['city'] ?></td>
+                            <td><?= $address['address'] ?></td>
+                            <td><?= $address['city'] ?></td>
                             <td><?= $tr['r_last_name'] . ', ' . $tr['r_first_name'] ?></td>
                             <td><?= $tr['r_address'] ?></td>
                             <td><?= $tr['r_city'] ?></td>
+                            <td><?= $tr['r_region'] ?></td>
                             <td><?= $tr['r_mobile_no'] ?></td>
                             <td><?= $tr['schedule_date'] ?></td>
                             <td><strong><?= $tr['status'] ?></strong</td>
-                            <td><button type="button" class="btn btn-info btn-sm" data-toggle="modal" data-target="#transactionsModal" id="<?= $tr['id'] ?>" onClick="initiateForms(<?= $tr['id'] ?>)">View Actions</button></td>
+                            <td><button type="button" class="btn btn-info btn-sm" data-toggle="modal" data-target="#transactionsModal" id="<?= $tr['id'] ?>" onClick="initiateForms(<?= $tr['user_id'] ?>,<?= $tr['id'] ?>)">View Actions</button></td>
                         </tr>
 
                     <?php } ?>
@@ -81,18 +87,9 @@
                 <h4 class="modal-title">[ID:<span class="title-id"></span>] Actions</h4>
             </div>
             <div class="modal-body">
-                <form method="post" class="assign-tracking-no action-form">
-                    <input type="hidden" name="transaction_id" class="transaction_id">
-                    <h4>Assign Tracking No.</h4>
-                    <div class="alert" role="alert"></div>
-                    <div class="input-group">
-                        <label for="tracking-no"></label>
-                        <input type="text" class="form-control" name="tracking-no" id="tracking-no" placeholder="Tracking No." disabled>
-                        <span class="input-group-btn">
-                                <button class="btn btn-success assign-btn" disabled>Assign</button>
-                        </span>
-                    </div>
-                </form>
+
+                <div class="alert" role="alert"></div>
+
                 <h4>Set as Completed</h4>
                 <button class="btn btn-success complete-btn" data-toggle="modal" data-target="#confirm-complete">Complete Transaction</button>
                 <h4>Set as Cancelled</h4>
@@ -116,6 +113,7 @@
             <div class="modal-body">
                 Are you sure you want to complete this transaction?
                 <form method="post" class="complete-transaction action-form">
+                    <input type="hidden" name="user_id" class="user_id">
                     <input type="hidden" name="transaction_id" class="transaction_id">
             </div>
             <div class="modal-footer">

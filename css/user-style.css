@@ -3,12 +3,12 @@
     padding-left: 70px !important;
 }
 
-.home-banner-buttons button{
+.home-banner-buttons a{
+    color: white;
     display: inline-block;
     text-align: center !important;
     padding: 15px;
     font-weight: 700;
-    width: 200px;
     min-width: 150px !important;
     margin: 0 20px;
     border-color: black;
@@ -16,7 +16,7 @@
     border-radius: 5px;
 }
 
-.home-banner-buttons button:hover {
+.home-banner-buttons a:hover {
     color: #FFFF7D;
 }
 
@@ -52,7 +52,7 @@ span.required {
     width: 120px;
 }
 
-.pick-up-schedule-btn {
+.pickup-schedule-btn {
     float: right;
 }
 
@@ -89,4 +89,33 @@ span.required {
 .remarks {
     height: 200px;
     margin-bottom: 10px;
+}
+
+.payment-form {
+    border-left: 2px solid black;
+}
+
+.payment-options {
+    min-height: 200px !important;
+}
+
+.payment-form {
+    min-height: 300px !important;
+}
+
+.schedule-nav{
+    width: 100%;
+    margin: 15px 0;
+}
+
+.schedule-nav button{
+    display: inline-block;
+}
+
+.schedule-nav .back{
+    float: left;
+}
+
+.schedule-nav .next{
+    float: right;
 }
