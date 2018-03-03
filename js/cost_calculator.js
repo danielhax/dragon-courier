@@ -8,8 +8,6 @@ function recalculate(){
 
     var cost = get_region_cost() + additional_weight_cost();
 
-    alert(cost);
-
     jQuery( '#pkg_cost' ).val( cost );
 
 }
